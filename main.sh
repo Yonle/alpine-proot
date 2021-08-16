@@ -33,4 +33,4 @@ else
   cat $CONTAINER_PATH/root/.hushlogin
 fi
 
-proot --link2symlink -r $CONTAINER_PATH -0 -w /root -b $TMPDIR -b /dev -b /proc -b /sys /usr/bin/env HOME=/root LANG=C.UTF-8 TERM=xterm-256color PATH=/bin:/sbin:/usr/bin:/usr/sbin /bin/su
+proot --link2symlink -r $CONTAINER_PATH -0 -w /root -b $TMPDIR -b /dev -b /proc -b /sys /usr/bin/env HOME=/root LANG=C.UTF-8 TERM=xterm-256color PATH=/bin:/sbin:/usr/bin:/usr/sbin /bin/su -l
