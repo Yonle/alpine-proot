@@ -20,7 +20,7 @@ if [ ! -x $CONTAINER_PATH ]; then
   mkdir $CONTAINER_PATH && cd $CONTAINER_PATH
   tar -xzf $HOME/cont.tar.gz && rm $HOME/cont.tar.gz
 
-  cp $PREFIX/etc/resolv.conf $CONTAINER_PATH/etc/resolv.conf
+  echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" > $CONTAINER_PATH/etc/resolv.conf
 fi
 
 clear
