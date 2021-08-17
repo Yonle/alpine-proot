@@ -25,11 +25,22 @@ fi
 
 clear
 
-if [ "$(uname -o)" = "Android" ]; then unset LD_PRELOAD;fi
+if [ "$(uname -o)" = "Android" ]; then unset LD_PRELOAD; fi
 
 # Detect pulseaudio with POSIX support
 if pulseaudio=$(command -v pulseaudio); then
   $pulseaudio --start --exit-idle-time=-1
+fi
+
+if ! proot=$(command -v proot); then
+  if [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg); then
+    pkg install proot -y 2> /dev/null
+    curl -L# https://raw.githubusercontent.com/Yonle/alpine-proot/master/main.sh | sh
+    exit
+  fi
+  echo "PRoot must be installed in order to execute this script."
+  echo "More information can go to https://proot-me.github.io"
+  exit 1
 fi
 
 if [ -f $CONTAINER_PATH/etc/motd ] && [ ! -f $CONTAINER_PATH/root/.hushlogin ]; then
