@@ -14,7 +14,7 @@ chmod +x main.sh
 Your system must have `pulseaudio` installed for this to work. At startup, The script automatically launch `pulseaudio` in non-system mode. 
 The script itself also binds `/tmp` from your `$TMPDIR` to work. In alpine session, Ran this command:
 ```sh
-export PULSE_SERVER=/tmp/pulse-*/native
+export PULSE_SERVER=unix:$(echo /tmp/pulse-*/native)
 ```
 And ran some program that plays audio output.
 
