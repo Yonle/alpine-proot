@@ -10,6 +10,16 @@ chmod +x main.sh
 ./main.sh
 ```
 
+## Sound supports
+Your system must have `pulseaudio` installed for this to work. At startup, The script automatically launch `pulseaudio` in non-system mode. 
+The script itself also binds `/tmp` from your `$TMPDIR` to work. In alpine session, Ran this command:
+```sh
+export PULSE_SERVER=unix:/tmp/pulse-*/native
+```
+And ran some program that plays audio output.
+
+Keep in mind that **__not every program__** supports pulse as audio output like `firefox` that drop pulseaudio support a year ago.
+
 ## Community
 - Discord Server: https://discord.gg/9S3ZCDR
 

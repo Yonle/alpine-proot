@@ -27,10 +27,21 @@ clear
 
 if [ "$(uname -o)" = "Android" ]; then unset LD_PRELOAD;fi
 
+# Detect pulseaudio with POSIX support
+if pulseaudio=$(command -v pulseaudio); then
+  $pulseaudio --start --exit-idle-time=-1
+fi
+
 if [ -f $CONTAINER_PATH/etc/motd ] && [ ! -f $CONTAINER_PATH/root/.hushlogin ]; then
   cat $CONTAINER_PATH/etc/motd
 else
   cat $CONTAINER_PATH/root/.hushlogin
 fi
 
-proot --link2symlink --kernel-release=5.4.0 -r $CONTAINER_PATH -0 -w /root -b $TMPDIR -b /dev -b /proc -b /sys /usr/bin/env HOME=/root LANG=C.UTF-8 TERM=xterm-256color PATH=/bin:/sbin:/usr/bin:/usr/sbin /bin/su -l
+proot \
+  --link2symlink \
+  --kernel-release=5.4.0 \
+  -r $CONTAINER_PATH -0 \
+  -w /root -b $TMPDIR:/tmp \
+  -b /dev -b $CONTAINER_PATH/root:/dev/shm \
+  -b /proc -b /sys /bin/su -l
