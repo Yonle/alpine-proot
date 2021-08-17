@@ -34,7 +34,7 @@ fi
 
 if ! proot=$(command -v proot); then
   if [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg); then
-    pkg install proot -y 2> /dev/null
+    pkg install proot -y
     curl -L# https://raw.githubusercontent.com/Yonle/alpine-proot/master/main.sh | sh
     exit
   fi
