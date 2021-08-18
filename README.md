@@ -1,5 +1,5 @@
 # alpine-proot 
-A script that used to emulate alpine linux with proot. This script also works for **__[Termux](https://termux.org)__**.
+A script that used to emulate alpine linux with proot. This script also works for every arch, linux distros, and even **__[Termux](https://termux.org)__**.
 
 ## Installation
 ```sh
@@ -11,12 +11,7 @@ chmod +x alpine-proot.sh
 ```
 
 ## Sound supports
-Your system must have `pulseaudio` installed for this to work. At startup, The script automatically launch `pulseaudio` in non-system mode. 
-The script itself also binds `/tmp` from your `$TMPDIR` to work. In alpine session, Ran this command:
-```sh
-export PULSE_SERVER=unix:$(echo /tmp/pulse-*/native)
-```
-And ran some program that plays audio output.
+In order to make this works, **__PulseAudio__** should be installed at host system. At startup, The script automatically launch pulseaudio server in non-system mode if there's no UNIX socket detected at `$PREFIX/var/run/pulse/native`. However, In this [alpine-proot](https://github.com/Yonle/alpine-proot), Sound support is already ready-to-use at startup as long you have pulseaudio installed in host.
 
 Keep in mind that **__not every program__** supports pulse as audio output like `firefox` that drop pulseaudio support a year ago.
 
