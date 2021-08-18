@@ -3,7 +3,7 @@ A script that used to emulate alpine linux with proot. This script also works fo
 
 ## Installation
 ```sh
-curl -Lo main.sh https://raw.githubusercontent.com/Yonle/alpine-proot/master/main.sh
+curl -Lo main.sh https://git.io/alpine-proot
 chmod +x main.sh 
 
 # To launch alpine proot anytime, do:
