@@ -11,8 +11,8 @@ fi
 
 if [ ! $TMPDIR ]; then export TMPDIR=/tmp; fi
 
-CONTAINER_PATH="$HOME/.container"
-CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/$(uname -m)/alpine-minirootfs-3.14.1-$(uname -m).tar.gz"
+if [ ! $CONTAINER_PATH ]; then export CONTAINER_PATH="$HOME/.container"; fi
+if [ ! $CONTAINER_DOWNLOAD_URL ]; then export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/$(uname -m)/alpine-minirootfs-3.14.1-$(uname -m).tar.gz"; fi
 
 if [ ! -x $CONTAINER_PATH ]; then
   curl -L#o $HOME/cont.tar.gz $CONTAINER_DOWNLOAD_URL
@@ -48,12 +48,16 @@ COMMANDS+=" -b $CONTAINER_PATH/root:/dev/shm"
 
 # Detect whenever Pulseaudio is installed with POSIX support
 if pulseaudio=$(command -v pulseaudio) && [ ! -f $PREFIX/var/run/pulse/native ]; then
-  $pulseaudio --start --exit-idle-time=-1
-  if [ $? = 0 ]; then COMMANDS+=" -b $(echo $TMPDIR/pulse-*/native):/var/run/pulse/native"; fi
-  if [ -f $CONTAINER_PATH/etc/pulse/client.conf ]; then sed -i "s/default-server =/default-server = unix:\/var\/run\/pulse\/native/g" $CONTAINER_PATH/etc/pulse/client.conf; fi
+  if [ ! $ALPINEPROOT_NO_PULSE ]; then
+    $pulseaudio --start --exit-idle-time=-1
+    if [ $? = 0 ]; then COMMANDS+=" -b $(echo $TMPDIR/pulse-*/native):/var/run/pulse/native"; fi
+    if [ -f $CONTAINER_PATH/etc/pulse/client.conf ]; then sed -i "s/default-server =/default-server = unix:\/var\/run\/pulse\/native/g" $CONTAINER_PATH/etc/pulse/client.conf; fi
+  fi
 else
-  if [ -f $PREFIX/var/run/pulse/native ]; then COMMANDS+=" -b $PREFIX/var/run/pulse/native:/var/run/pulse/native"; fi;
-  if [ -f $CONTAINER_PATH/etc/pulse/client.conf ]; then sed -i "s/default-server =/default-server = unix:\/var\/run\/pulse\/native/g" $CONTAINER_PATH/etc/pulse/client.conf; fi
+  if [ ! $ALPINEPROOT_NO_PULSE ]; then
+    if [ -f $PREFIX/var/run/pulse/native ]; then COMMANDS+=" -b $PREFIX/var/run/pulse/native:/var/run/pulse/native"; fi;
+    if [ -f $CONTAINER_PATH/etc/pulse/client.conf ]; then sed -i "s/default-server =/default-server = unix:\/var\/run\/pulse\/native/g" $CONTAINER_PATH/etc/pulse/client.conf; fi
+  fi
 fi
 
 if [ $@ ]; then
