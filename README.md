@@ -3,11 +3,11 @@ A script that used to emulate alpine linux with proot. This script also works fo
 
 ## Installation
 ```sh
-curl -Lo main.sh https://git.io/alpine-proot
-chmod +x main.sh 
+curl -Lo alpine-proot.sh git.io/alpine-proot.sh
+chmod +x alpine-proot.sh 
 
 # To launch alpine proot anytime, do:
-./main.sh
+./alpine-proot.sh
 ```
 
 ## Sound supports
