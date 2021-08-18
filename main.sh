@@ -51,6 +51,7 @@ fi
 
 proot \
   --link2symlink \
+  --kill-on-exit \
   --kernel-release=5.4.0 \
   -r $CONTAINER_PATH -0 \
   -w /root -b $TMPDIR:/tmp \
