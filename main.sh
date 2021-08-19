@@ -17,7 +17,7 @@ if [ ! $CONTAINER_DOWNLOAD_URL ]; then export CONTAINER_DOWNLOAD_URL="https://dl
 if [ ! -x $CONTAINER_PATH ]; then
   curl -L#o $HOME/cont.tar.gz $CONTAINER_DOWNLOAD_URL
   if [ $? != 0 ]; then exit 1; fi
-  mkdir $CONTAINER_PATH && cd $CONTAINER_PATH
+  mkdir -p $CONTAINER_PATH && cd $CONTAINER_PATH
   tar -xzf $HOME/cont.tar.gz && rm $HOME/cont.tar.gz
 
   echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" > $CONTAINER_PATH/etc/resolv.conf
