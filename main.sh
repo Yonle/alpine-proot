@@ -51,12 +51,12 @@ if pulseaudio=$(command -v pulseaudio) && [ ! -f $PREFIX/var/run/pulse/native ];
   if [ ! $ALPINEPROOT_NO_PULSE ]; then
     $pulseaudio --start --exit-idle-time=-1
     if [ $? = 0 ]; then COMMANDS+=" -b $(echo $TMPDIR/pulse-*/native):/var/run/pulse/native"; fi
-    if [ -f $CONTAINER_PATH/etc/pulse/client.conf ]; then sed -i "s/default-server =/default-server = unix:\/var\/run\/pulse\/native/g" $CONTAINER_PATH/etc/pulse/client.conf; fi
+    if [ -f $CONTAINER_PATH/etc/pulse/client.conf ]; then sed -i "s/default-server =/default-server = unix:\/\/\/var\/run\/pulse\/native/g" $CONTAINER_PATH/etc/pulse/client.conf; fi
   fi
 else
   if [ ! $ALPINEPROOT_NO_PULSE ]; then
     if [ -f $PREFIX/var/run/pulse/native ]; then COMMANDS+=" -b $PREFIX/var/run/pulse/native:/var/run/pulse/native"; fi;
-    if [ -f $CONTAINER_PATH/etc/pulse/client.conf ]; then sed -i "s/default-server =/default-server = unix:\/var\/run\/pulse\/native/g" $CONTAINER_PATH/etc/pulse/client.conf; fi
+    if [ -f $CONTAINER_PATH/etc/pulse/client.conf ]; then sed -i "s/default-server =/default-server = unix:\/\/\/var\/run\/pulse\/native/g" $CONTAINER_PATH/etc/pulse/client.conf; fi
   fi
 fi
 
@@ -66,7 +66,7 @@ else
   if [ -f $CONTAINER_PATH/etc/motd ] && [ ! -f $CONTAINER_PATH/root/.hushlogin ]; then
     cat $CONTAINER_PATH/etc/motd
   else
-    cat $CONTAINER_PATH/root/.hushlogin
+    if [ -f $CONTAINER_PATH/root/.hushlogin ]; then cat $CONTAINER_PATH/root/.hushlogin; fi
   fi
   $COMMANDS /bin/su -l
 fi
