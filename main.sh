@@ -3,16 +3,25 @@
 # alpine-proot - A script that used to emulate alpine linux with proot
 # https://github.com/Yonle/alpine-proot
 
-if [ ! $HOME ]; then export HOME=/home; fi
+if [ ! $HOME ]; then
+  export HOME=/home
+fi
 
 if [ ! $PREFIX ] && [ -x /usr ]; then
   export PREFIX=/usr
 fi
 
-if [ ! $TMPDIR ]; then export TMPDIR=/tmp; fi
+if [ ! $TMPDIR ]; then
+  export TMPDIR=/tmp
+fi
 
-if [ ! $CONTAINER_PATH ]; then export CONTAINER_PATH="$HOME/.container"; fi
-if [ ! $CONTAINER_DOWNLOAD_URL ]; then export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/$(uname -m)/alpine-minirootfs-3.14.1-$(uname -m).tar.gz"; fi
+if [ ! $CONTAINER_PATH ]; then
+  export CONTAINER_PATH="$HOME/.container"
+fi
+
+if [ ! $CONTAINER_DOWNLOAD_URL ]; then
+  export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/$(uname -m)/alpine-minirootfs-3.14.1-$(uname -m).tar.gz"
+fi
 
 if [ ! -x $CONTAINER_PATH ]; then
   curl -L#o $HOME/cont.tar.gz $CONTAINER_DOWNLOAD_URL
@@ -50,26 +59,26 @@ COMMANDS+=" -b $CONTAINER_PATH/root:/dev/shm"
 if pulseaudio=$(command -v pulseaudio) && [ ! -f $PREFIX/var/run/pulse/native ]; then
   if [ ! $ALPINEPROOT_NO_PULSE ]; then
     $pulseaudio --start --exit-idle-time=-1
-    if [ $? = 0 ]; then COMMANDS+=" -b $(echo $TMPDIR/pulse-*/native):/var/run/pulse/native"; fi
-    if [ -f $CONTAINER_PATH/etc/pulse/client.conf ]; then
-      sed -i "s/default-server =/default-server = unix:\/\/\/var\/run\/pulse\/native/g" $CONTAINER_PATH/etc/pulse/client.conf
-      sed -i "s/unix:\/\/\/var\/run\/pulse\/native unix:\/\/\/var\/run\/pulse\/native/unix:\/\/\/var\/run\/pulse\/native/g" $CONTAINER_PATH/etc/pulse/client.conf
+    if [ $? = 0 ]; then
+      COMMANDS+=" -b $(echo $TMPDIR/pulse-*/native):/var/run/pulse/native"
     fi
   fi
 else
   if [ ! $ALPINEPROOT_NO_PULSE ]; then
-    if [ -f $PREFIX/var/run/pulse/native ]; then COMMANDS+=" -b $PREFIX/var/run/pulse/native:/var/run/pulse/native"; fi;
-    if [ -f $CONTAINER_PATH/etc/pulse/client.conf ]; then
-      sed -i "s/default-server =/default-server = unix:\/\/\/var\/run\/pulse\/native/g" $CONTAINER_PATH/etc/pulse/client.conf
-      sed -i "s/unix:\/\/\/var\/run\/pulse\/native unix:\/\/\/var\/run\/pulse\/native/unix:\/\/\/var\/run\/pulse\/native/g" $CONTAINER_PATH/etc/pulse/client.conf
+    if [ -f $PREFIX/var/run/pulse/native ]; then
+      COMMANDS+=" -b $PREFIX/var/run/pulse/native:/var/run/pulse/native"
     fi
   fi
 fi
 
-if [ "$ALPINEPROOT_PROOT_OPTIONS" ]; then COMMANDS+=" $ALPINEPROOT_PROOT_OPTIONS"; fi
+if [ "$ALPINEPROOT_PROOT_OPTIONS" ]; then
+  COMMANDS+=" $ALPINEPROOT_PROOT_OPTIONS"
+fi
 
 # Detect whenever ALPINEPROOT_BIND_TMPDIR is available or no.
-if [ $ALPINEPROOT_BIND_TMPDIR ]; then COMMANDS+=" -b $TMPDIR:/tmp"; fi
+if [ $ALPINEPROOT_BIND_TMPDIR ]; then
+  COMMANDS+=" -b $TMPDIR:/tmp"
+fi
 
 if [ $@ ]; then
   $COMMANDS /bin/su -c $@
