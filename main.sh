@@ -60,6 +60,8 @@ else
   fi
 fi
 
+if [ $ALPINEPROOT_PROOT_ARGS ]; then COMMANDS+=" $ALPINEPROOT_PROOT_ARGS"; fi
+
 # Detect whenever ALPINEPROOT_BIND_TMPDIR is available or no.
 if [ $ALPINEPROOT_BIND_TMPDIR ]; then COMMANDS+=" -b $TMPDIR:/tmp"; fi
 
