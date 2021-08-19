@@ -61,7 +61,7 @@ else
 fi
 
 # Detect whenever ALPINEPROOT_BIND_TMPDIR is available or no.
-if [ $ALPINEPROOT_BIND_TMPDIR ]; then COMMANDS+=" -b $TMPDIR/tmp"; fi
+if [ $ALPINEPROOT_BIND_TMPDIR ]; then COMMANDS+=" -b $TMPDIR:/tmp"; fi
 
 if [ $@ ]; then
   $COMMANDS /bin/su -c $@
