@@ -23,7 +23,7 @@ if [ ! $CONTAINER_DOWNLOAD_URL ]; then
   export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/$(uname -m)/alpine-minirootfs-3.14.1-$(uname -m).tar.gz"
 fi
 
-if [ ! -x $CONTAINER_PATH ]; then
+if [ ! -x $CONTAINER_PATH ] || [ -z "$(ls -A $CONTAINER_PATH)" ]; then
   curl -L#o $HOME/cont.tar.gz $CONTAINER_DOWNLOAD_URL
   if [ $? != 0 ]; then exit 1; fi
   mkdir -p $CONTAINER_PATH && cd $CONTAINER_PATH
@@ -31,8 +31,6 @@ if [ ! -x $CONTAINER_PATH ]; then
 
   echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" > $CONTAINER_PATH/etc/resolv.conf
 fi
-
-clear
 
 if [ "$(uname -o)" = "Android" ]; then unset LD_PRELOAD; fi
 
