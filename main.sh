@@ -23,7 +23,7 @@ if [ ! $HOME ]; then
 fi
 
 if [ ! $PREFIX ] && [ -x /usr ]; then
-  if [ -x /usr ]; then
+  if [ -d /usr ]; then
     export PREFIX=/usr
   fi
 fi
