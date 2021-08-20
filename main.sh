@@ -3,7 +3,7 @@
 # alpine-proot - A script that used to emulate alpine linux with proot
 # https://github.com/Yonle/alpine-proot
 
-if [ "$ALPINE_FORCE" ]; then
+if [ "$ALPINEPROOT_FORCE" ]; then
   echo "========= WARNING ========="
   echo "I'm sure you know what are you doing. You shouldn't open a issue in our github if one of issue occurs like pulseaudio error and more so like that if you run alpine-proot as root."
   echo -e "\nYonle and other contributor is not responsible to any incidents with your device when you ran alpine-proot as root such as Wiped /proc or /sys Accidentally, No longer boots your Device again, Fired from business, and more so like that.\n"
@@ -13,7 +13,7 @@ fi
 
 
 # Do not run if user run this script as root
-if [ $(id -u) = 0 ] && [ ! "$ALPINE_FORCE" ]; then
+if [ $(id -u) = 0 ] && [ ! "$ALPINEPROOT_FORCE" ]; then
   echo "Running alpine-proot as root is dangerous and can harm one of your system component. Because of that, I'm aborting now. You may set ALPINEPROOT_FORCE variable as 1 if you want to continue."
   exit 6
 fi
