@@ -43,15 +43,20 @@ fi
 # Install / Reinstall if container directory is unavailable or empty.
 if [ ! -x $CONTAINER_PATH ] || [ -z "$(ls -A $CONTAINER_PATH)" ]; then
   # Download rootfs if there's no rootfs download cache.
-  if [ ! -f $HOME/.cache_rootfs.tar.gz ]; then
-    curl -L#o $HOME/.cache_rootfs.tar.gz $CONTAINER_DOWNLOAD_URL
+  if [ ! -f $HOME/.cached_rootfs.tar.gz ]; then
+    if [ ! -x $(command -v curl) ]; then
+      echo "libcurl nust be installed in order to download rootfs manually"
+      echo "More information can go to https://curl.se/libcurl"
+      exit 6
+    fi
+    curl -L#o $HOME/.cached_rootfs.tar.gz $CONTAINER_DOWNLOAD_URL
     if [ $? != 0 ]; then exit 1; fi
   fi
 
   # Wipe and extract rootfs
   rm -rf $CONTAINER_PATH
   mkdir -p $CONTAINER_PATH
-  tar -xzf $HOME/.cache_rootfs.tar.gz -C $CONTAINER_PATH
+  tar -xzf $HOME/.cached_rootfs.tar.gz -C $CONTAINER_PATH
 
   echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" > $CONTAINER_PATH/etc/resolv.conf
 fi
@@ -66,7 +71,7 @@ if ! proot=$(command -v proot); then
   fi
   echo "PRoot must be installed in order to execute this script."
   echo "More information can go to https://proot-me.github.io"
-  exit 1
+  exit 6
 fi
 
 COMMANDS="proot"
