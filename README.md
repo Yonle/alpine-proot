@@ -1,5 +1,5 @@
 # alpine-proot 
-A Well quick standalone alpine proot installer & launcher. Also works for every arch, linux distros, and even in **__[Termux](https://termux.org)__**.
+A well quick standalone alpine proot installer & launcher. Also works for every arch, linux distros, and even in **__[Termux](https://termux.org)__**.
 
 ## Installation
 ```sh
