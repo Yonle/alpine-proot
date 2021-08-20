@@ -23,7 +23,9 @@ if [ ! $HOME ]; then
 fi
 
 if [ ! $PREFIX ] && [ -x /usr ]; then
-  export PREFIX=/usr
+  if [ -x /usr ]; then
+    export PREFIX=/usr
+  fi
 fi
 
 if [ ! $TMPDIR ]; then
