@@ -45,7 +45,12 @@ if [ ! -x $CONTAINER_PATH ] || [ -z "$(ls -A $CONTAINER_PATH)" ]; then
   # Download rootfs if there's no rootfs download cache.
   if [ ! -f $HOME/.cached_rootfs.tar.gz ]; then
     if [ ! -x $(command -v curl) ]; then
-      echo "libcurl nust be installed in order to download rootfs manually"
+      if [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg); then
+        pkg install proot -y
+        curl -L# https://raw.githubusercontent.com/Yonle/alpine-proot/master/main.sh | bash
+        exit 0
+      fi
+      echo "libcurl is required in order to download rootfs manually"
       echo "More information can go to https://curl.se/libcurl"
       exit 6
     fi
@@ -67,9 +72,9 @@ if ! proot=$(command -v proot); then
   if [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg); then
     pkg install proot -y
     curl -L# https://raw.githubusercontent.com/Yonle/alpine-proot/master/main.sh | bash
-    exit
+    exit 0
   fi
-  echo "PRoot must be installed in order to execute this script."
+  echo "PRoot is required in order to execute this script."
   echo "More information can go to https://proot-me.github.io"
   exit 6
 fi
