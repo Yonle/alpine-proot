@@ -78,16 +78,16 @@ COMMANDS+=" -r $CONTAINER_PATH -0 -w /root"
 COMMANDS+=" -b $CONTAINER_PATH/root:/dev/shm"
 
 # Detect whenever Pulseaudio is installed with POSIX support
-if pulseaudio=$(command -v pulseaudio) && [ ! -f $PREFIX/var/run/pulse/native ]; then
+if pulseaudio=$(command -v pulseaudio) && [ ! -S $PREFIX/var/run/pulse/native ]; then
   if [ ! $ALPINEPROOT_NO_PULSE ]; then
     $pulseaudio --start --exit-idle-time=-1
-    if [ $? = 0 ]; then
+    if [ $? = 0 ] && [ -S "$(echo $TMPDIR/pulse-*/native)" ]; then
       COMMANDS+=" -b $(echo $TMPDIR/pulse-*/native):/var/run/pulse/native"
     fi
   fi
 else
   if [ ! $ALPINEPROOT_NO_PULSE ]; then
-    if [ -f $PREFIX/var/run/pulse/native ]; then
+    if [ -S $PREFIX/var/run/pulse/native ]; then
       COMMANDS+=" -b $PREFIX/var/run/pulse/native:/var/run/pulse/native"
     fi
   fi
