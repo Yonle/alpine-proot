@@ -46,7 +46,7 @@ if [ ! -x $CONTAINER_PATH ] || [ -z "$(ls -A $CONTAINER_PATH)" ]; then
   if [ ! -f $HOME/.cached_rootfs.tar.gz ]; then
     if [ ! -x $(command -v curl) ]; then
       if [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg); then
-        pkg install proot -y
+        pkg install curl -y
         curl -L# https://raw.githubusercontent.com/Yonle/alpine-proot/master/main.sh | bash
         exit 0
       fi
