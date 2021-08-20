@@ -4,13 +4,8 @@
 # https://github.com/Yonle/alpine-proot
 
 if [ "$ALPINEPROOT_FORCE" ]; then
-  echo "========= WARNING ========="
-  echo "I'm sure you know what are you doing. You shouldn't open a issue in our github if one of issue occurs like pulseaudio error and more so like that if you run alpine-proot as root."
-  echo -e "\nYonle and other contributor is not responsible to any incidents with your device when you ran alpine-proot as root such as Wiped /proc or /sys Accidentally, No longer boots your Device again, Fired from business, and more so like that.\n"
-  echo -e "If you point your finger to us at court due to these incidents, I will laugh at you.\n"
-  echo -e "You're in your own risk.\n"
+  echo "Warning: I'm sure you know what are you doing."
 fi
-
 
 # Do not run if user run this script as root
 if [ $(id -u) = 0 ] && [ ! "$ALPINEPROOT_FORCE" ]; then
