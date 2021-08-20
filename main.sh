@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# alpine-proot - A script that used to emulate alpine linux with proot
+# alpine-proot - A well quick standalone alpine proot installer & launcher.
 # https://github.com/Yonle/alpine-proot
 
 if [ "$ALPINEPROOT_FORCE" ]; then
