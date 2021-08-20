@@ -3,6 +3,21 @@
 # alpine-proot - A script that used to emulate alpine linux with proot
 # https://github.com/Yonle/alpine-proot
 
+if [ "$ALPINE_FORCE" ]; then
+  echo "========= WARNING ========="
+  echo "I'm sure you know what are you doing. You shouldn't open a issue in our github if one of issue occurs like pulseaudio error and more so like that if you run alpine-proot as root."
+  echo -e "\nYonle and other contributor is not responsible to any incidents with your device when you ran alpine-proot as root such as Wiped /proc or /sys Accidentally, No longer boots your Device again, Fired from business, and more so like that.\n"
+  echo -e "If you point your finger to us at court due to these incidents, I will laugh at you.\n"
+  echo -e "You're in your own risk.\n"
+fi
+
+
+# Do not run if user run this script as root
+if [ $(id -u) = 0 ] && [ ! "$ALPINE_FORCE" ]; then
+  echo "Running alpine-proot as root is dangerous and can harm one of your system component. Because of that, I'm aborting now. You may set ALPINEPROOT_FORCE variable as 1 if you want to continue."
+  exit 6
+fi
+
 if [ ! $HOME ]; then
   export HOME=/home
 fi
@@ -23,11 +38,18 @@ if [ ! $CONTAINER_DOWNLOAD_URL ]; then
   export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/$(uname -m)/alpine-minirootfs-3.14.1-$(uname -m).tar.gz"
 fi
 
+# Install / Reinstall if container directory is unavailable or empty.
 if [ ! -x $CONTAINER_PATH ] || [ -z "$(ls -A $CONTAINER_PATH)" ]; then
-  curl -L#o $HOME/cont.tar.gz $CONTAINER_DOWNLOAD_URL
-  if [ $? != 0 ]; then exit 1; fi
-  mkdir -p $CONTAINER_PATH && cd $CONTAINER_PATH
-  tar -xzf $HOME/cont.tar.gz && rm $HOME/cont.tar.gz
+  # Download rootfs if there's no rootfs download cache.
+  if [ ! -f $HOME/.cache_rootfs.tar.gz ]; then
+    curl -L#o $HOME/.cache_rootfs.tar.gz $CONTAINER_DOWNLOAD_URL
+    if [ $? != 0 ]; then exit 1; fi
+  fi
+
+  # Wipe and extract rootfs
+  rm -rf $CONTAINER_PATH
+  mkdir -p $CONTAINER_PATH
+  tar -xzf $HOME/.cache_rootfs.tar.gz -C $CONTAINER_PATH
 
   echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" > $CONTAINER_PATH/etc/resolv.conf
 fi
@@ -37,7 +59,7 @@ if [ "$(uname -o)" = "Android" ]; then unset LD_PRELOAD; fi
 if ! proot=$(command -v proot); then
   if [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg); then
     pkg install proot -y
-    curl -L# https://raw.githubusercontent.com/Yonle/alpine-proot/master/main.sh | sh
+    curl -L# https://raw.githubusercontent.com/Yonle/alpine-proot/master/main.sh | bash
     exit
   fi
   echo "PRoot must be installed in order to execute this script."
@@ -49,8 +71,8 @@ COMMANDS="proot"
 COMMANDS+=" --link2symlink"
 COMMANDS+=" --kill-on-exit"
 COMMANDS+=" --kernel-release=5.4.0"
-COMMANDS+=" -r $CONTAINER_PATH -0"
-COMMANDS+=" -w /root -b /dev -b /proc -b /sys"
+COMMANDS+=" -b /dev -b /proc -b /sys"
+COMMANDS+=" -r $CONTAINER_PATH -0 -w /root"
 COMMANDS+=" -b $CONTAINER_PATH/root:/dev/shm"
 
 # Detect whenever Pulseaudio is installed with POSIX support
