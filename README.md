@@ -2,7 +2,7 @@
 # alpine-proot 
 A well quick standalone Alpine PRoot installer & launcher. Also works for every architectures, Linux distros, and even in **__[Termux](https://termux.org)__**.
 
-alpine-proot support both [Plain PRoot](https://github.com/proot-me/proot) and [proot-rs (Rust)](https://github.com/proot-me/proot-rs). If you have both proot and proot-rs installed, but you want to use proot-rs instead to launch alpine-proot, simply set `ALPINEPROOT_USE_PROOT_RS` as `true`.
+alpine-proot support both [Plain PRoot](https://github.com/proot-me/proot) and [proot-rs (Rust)](https://github.com/proot-me/proot-rs). If you have both proot and proot-rs installed, but you want to use proot-rs instead to launch alpine-proot, simply set [`ALPINEPROOT_USE_PROOT_RS`](https://github.com/Yonle/alpine-proot/wiki/Environment-Variables#alpineproot_use_proot_rs) as `true`.
 
 ## Installation
 ```sh
