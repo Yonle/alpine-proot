@@ -37,7 +37,7 @@ fi
 
 alpineproot() {
   # Install / Reinstall if container directory is unavailable or empty.
-  if [ ! -x $CONTAINER_PATH ] || [ -z "$(ls -A $CONTAINER_PATH)" ]; then
+  if [ ! -d $CONTAINER_PATH ] || [ -z "$(ls -A $CONTAINER_PATH)" ] || [ ! -x $CONTAINER_PATH/bin/su ]; then
     # Download rootfs if there's no rootfs download cache.
     if [ ! -f $HOME/.cached_rootfs.tar.gz ]; then
       if [ ! -x $(command -v curl) ]; then
@@ -57,6 +57,12 @@ alpineproot() {
     rm -rf $CONTAINER_PATH
     mkdir -p $CONTAINER_PATH
     tar -xzf $HOME/.cached_rootfs.tar.gz -C $CONTAINER_PATH
+
+    # If extraction fail, Delete cached rootfs and try again
+    if [ $? != 0 ]; then
+      rm -f $HOME/.cached_rootfs.tar.gz && alpineproot $@
+      exit 0
+    fi
 
     echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" > $CONTAINER_PATH/etc/resolv.conf
   fi
