@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# alpine-proot - A well quick standalone alpine proot installer & launcher.
+# alpine-proot - A well quick standalone Alpine PRoot installer & launcher
 # https://github.com/Yonle/alpine-proot
 
 if [ "$ALPINEPROOT_FORCE" ]; then
