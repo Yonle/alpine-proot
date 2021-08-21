@@ -36,14 +36,23 @@ if [ ! $CONTAINER_DOWNLOAD_URL ]; then
 fi
 
 alpineproot() {
+  export PROOT=$(command -v proot) || $(command -v proot-rs)
+
+  if [ "$ALPINEPROOT_USE_PROOT_RS" ] && [ -x $(command -v proot-rs) ]; then
+    unset PROOT && export PROOT=$(command -v proot-rs)
+  fi
+
+  if [ -x "$ALPINEPROOT_PROOT_PATH" ]; then
+    unset PROOT && export PROOT=$ALPINEPROOT_PROOT_PATH
+  fi
 
   # Check whenever proot is installed or no
-  if ! proot=$(command -v proot); then
+  if [ ! -x $PROOT ]; then
     if [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg); then
       pkg install proot -y && alpineproot $@
       exit 0
     fi
-    echo "PRoot is required in order to execute this script."
+    echo "PRoot / PRoot-rs is required in order to execute this script."
     echo "More information can go to https://proot-me.github.io"
     exit 6
   fi
@@ -81,7 +90,7 @@ alpineproot() {
 
   if [ "$(uname -o)" = "Android" ]; then unset LD_PRELOAD; fi
 
-  COMMANDS="proot"
+  COMMANDS=$PROOT
   COMMANDS+=" --link2symlink"
   COMMANDS+=" --kill-on-exit"
   COMMANDS+=" --kernel-release=5.4.0"
