@@ -36,6 +36,18 @@ if [ ! $CONTAINER_DOWNLOAD_URL ]; then
 fi
 
 alpineproot() {
+
+  # Check whenever proot is installed or no
+  if ! proot=$(command -v proot); then
+    if [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg); then
+      pkg install proot -y && alpineproot $@
+      exit 0
+    fi
+    echo "PRoot is required in order to execute this script."
+    echo "More information can go to https://proot-me.github.io"
+    exit 6
+  fi
+
   # Install / Reinstall if container directory is unavailable or empty.
   if [ ! -d $CONTAINER_PATH ] || [ -z "$(ls -A $CONTAINER_PATH)" ] || [ ! -x $CONTAINER_PATH/bin/su ]; then
     # Download rootfs if there's no rootfs download cache.
@@ -68,16 +80,6 @@ alpineproot() {
   fi
 
   if [ "$(uname -o)" = "Android" ]; then unset LD_PRELOAD; fi
-
-  if ! proot=$(command -v proot); then
-    if [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg); then
-      pkg install proot -y && alpineproot $@
-      exit 0
-    fi
-    echo "PRoot is required in order to execute this script."
-    echo "More information can go to https://proot-me.github.io"
-    exit 6
-  fi
 
   COMMANDS="proot"
   COMMANDS+=" --link2symlink"
