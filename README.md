@@ -14,10 +14,9 @@ chmod +x alpine-proot.sh
 ```
 
 For more information about alpine-proot, please check the alpine-proot [wiki](https://github.com/Yonle/alpine-proot/wiki).
+
 ## Sound support
 In order to make this works, **__PulseAudio__** should be installed at host system. At startup, the script automatically launch PulseAudio server in non-system mode if there is no pulse UNIX socket detected.. However, in [alpine-proot](https://github.com/Yonle/alpine-proot), sound support is already ready-to-use at startup as long you have PulseAudio installed on the host system.
-
-Keep in mind that **__not every program__** supports pulse as audio output like Firefox that drop PulseAudio support a year ago.
 
 ## Online alpine-proot
 https://replit.com/@Yonle/PRoot (1 GB Storage per anonymous user)
