@@ -284,8 +284,9 @@ EOM
   # Detect whenever Pulseaudio is installed with POSIX support
   if pulseaudio=$(command -v pulseaudio) && [ ! -S $PREFIX/var/run/pulse/native ]; then
     if [ ! $ALPINEPROOT_NO_PULSE ]; then
-      trap "$pulseaudio --start --exit-idle-time=-1" CHLD
-      $pulseaudio --check
+      if ! $pulseaudio --check; then
+        $pulseaudio --start --exit-idle-time=-1
+      fi
 
       if [ $? = 0 ] && [ -S "$(echo $TMPDIR/pulse-*/native)" ]; then
         COMMANDS+=" -b $(echo $TMPDIR/pulse-*/native):/var/run/pulse/native"
