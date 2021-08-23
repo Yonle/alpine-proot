@@ -88,7 +88,8 @@ alpineproot() {
     echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" > $CONTAINER_PATH/etc/resolv.conf
   fi
 
-  if [ ! -d $CONTAINER_PATH/proc ]; then
+  if [ -d $CONTAINER_PATH/proc ]; then
+    rm -rf $CONTAINER_PATH/proc
     mkdir $CONTAINER_PATH/proc
   fi
 
