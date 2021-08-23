@@ -284,7 +284,7 @@ EOM
 
   # Detect whenever Pulseaudio is installed with POSIX support
   if pulseaudio=$(command -v pulseaudio) && [ ! -S $PREFIX/var/run/pulse/native ]; then
-    if [ ! $ALPINEPROOT_NO_PULSE ]; then
+    if [ -z "$ALPINEPROOT_NO_PULSE" ]; then
       if ! $pulseaudio --check; then
         $pulseaudio --start --exit-idle-time=-1
       fi
@@ -294,32 +294,23 @@ EOM
       fi
     fi
   else
-    if [ ! $ALPINEPROOT_NO_PULSE ]; then
+    if [ -z "$ALPINEPROOT_NO_PULSE" ]; then
       if [ -S $PREFIX/var/run/pulse/native ]; then
         COMMANDS+=" -b $PREFIX/var/run/pulse/native:/var/run/pulse/native"
       fi
     fi
   fi
 
-  if [ "$ALPINEPROOT_PROOT_OPTIONS" ]; then
+  if [ -n "$ALPINEPROOT_PROOT_OPTIONS" ]; then
     COMMANDS+=" $ALPINEPROOT_PROOT_OPTIONS"
   fi
 
   # Detect whenever ALPINEPROOT_BIND_TMPDIR is available or no.
-  if [ $ALPINEPROOT_BIND_TMPDIR ]; then
+  if [ -n "$ALPINEPROOT_BIND_TMPDIR" ]; then
     COMMANDS+=" -b $TMPDIR:/tmp"
   fi
 
-  if [ $@ ]; then
-    $COMMANDS /bin/su -c $@
-  else
-    if [ -f $CONTAINER_PATH/etc/motd ] && [ ! -f $CONTAINER_PATH/root/.hushlogin ]; then
-      cat $CONTAINER_PATH/etc/motd
-    else
-      if [ -f $CONTAINER_PATH/root/.hushlogin ]; then cat $CONTAINER_PATH/root/.hushlogin; fi
-    fi
-    $COMMANDS /bin/su -l
-  fi
+  $COMMANDS /bin/su -l $@
 }
 
 alpineproot $@
