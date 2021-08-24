@@ -38,16 +38,16 @@ fi
 alpineproot() {
   export PROOT=$(command -v proot) || $(command -v proot-rs)
 
-  if [ -n $ALPINEPROOT_USE_PROOT_RS ] && [ -x $(command -v proot-rs) ]; then
+  if [ -n "$ALPINEPROOT_USE_PROOT_RS" ] && [ -x $(command -v proot-rs) ]; then
     unset PROOT && export PROOT=$(command -v proot-rs)
   fi
 
-  if [ -n $ALPINEPROOT_PROOT_PATH ]; then
+  if [ -n "$ALPINEPROOT_PROOT_PATH" ]; then
     unset PROOT && export PROOT=$ALPINEPROOT_PROOT_PATH
   fi
 
   # Check whenever proot is installed or no
-  if [ -z $PROOT ] || [ ! -x $PROOT ]; then
+  if [ -z "$PROOT" ] || [ ! -x $PROOT ]; then
     if [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg); then
       pkg install proot -y && alpineproot $@
       exit 0
