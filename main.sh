@@ -47,7 +47,7 @@ alpineproot() {
   fi
 
   # Check whenever proot is installed or no
-  if [ ! -x $PROOT ]; then
+  if [ -z $PROOT ] || [ ! -x $PROOT ]; then
     if [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg); then
       pkg install proot -y && alpineproot $@
       exit 0
