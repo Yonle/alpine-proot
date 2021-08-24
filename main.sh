@@ -94,12 +94,12 @@ alpineproot() {
   fi
 
   # Proceed make fake /proc/version
-  if [ ! -f $CONTAINER_PATH/proc/.version ]; then
+  if [ ! -f /proc/version ] || [ ! -f $CONTAINER_PATH/proc/.version ]; then
     echo "Linux version 5.4.120+ (root@localhost) #1 SMP Fri Jul 23 12:00:00 PDT 2021" > $CONTAINER_PATH/proc/.version
   fi
 
   # Proceed make fake /proc/stat
-  if [ ! -f $CONTAINER_PATH/proc/.stat ]; then
+  if [ ! -f /proc/stat ] || [ ! -f $CONTAINER_PATH/proc/.stat ]; then
     cat <<- EOM > $CONTAINER_PATH/proc/.stat
 cpu  5742 0 3915 205916 1204 0 339 82 0 0
 cpu0 1428 0 904 51706 126 0 108 21 0 0
@@ -117,17 +117,17 @@ EOM
   fi
 
   # Proceed make fake /proc/uptime
-  if [ ! -f $CONTAINER_PATH/proc/.uptime ]; then
+  if [ ! -f /proc/uptime ] || [ ! -f $CONTAINER_PATH/proc/.uptime ]; then
     echo "1302.49 5018.43" > $CONTAINER_PATH/proc/.uptime
   fi
 
   # Proceed make fake /proc/loadavg
-  if [ ! -f $CONTAINER_PATH/proc/.loadavg ]; then
+  if [ ! -f /proc/loadavg ] || [ ! -f $CONTAINER_PATH/proc/.loadavg ]; then
     echo "0.54 0.22 0.13 1/461 650" > $CONTAINER_PATH/proc/.loadavg
   fi
 
   # Proceed make fake /proc/vmstat
-  if [ ! -f $CONTAINER_PATH/proc/.vmstat ]; then
+  if [ ! -f /proc/vmstat ] || [ ! -f $CONTAINER_PATH/proc/.vmstat ]; then
     cat <<- EOM > $CONTAINER_PATH/proc/.vmstat
 nr_free_pages 3621122
 nr_zone_inactive_anon 13457
@@ -277,7 +277,9 @@ EOM
   COMMANDS+=" -b /proc/self/fd/1:/dev/stdout"
   COMMANDS+=" -b /proc/self/fd/2:/dev/stderr"
   for f in stat version loadavg vmstat uptime; do
-    COMMANDS+=" -b $CONTAINER_PATH/proc/.$f:/proc/$f"
+    if [ -f "$CONTAINER_PATH/proc/.$f" ]; then
+      COMMANDS+=" -b $CONTAINER_PATH/proc/.$f:/proc/$f"
+    fi
   done
   COMMANDS+=" -r $CONTAINER_PATH -0 -w /root"
   COMMANDS+=" -b $CONTAINER_PATH/root:/dev/shm"
