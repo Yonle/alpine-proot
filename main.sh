@@ -38,11 +38,11 @@ fi
 alpineproot() {
   export PROOT=$(command -v proot) || $(command -v proot-rs)
 
-  if [ "$ALPINEPROOT_USE_PROOT_RS" ] && [ -x $(command -v proot-rs) ]; then
+  if [ -n $ALPINEPROOT_USE_PROOT_RS ] && [ -x $(command -v proot-rs) ]; then
     unset PROOT && export PROOT=$(command -v proot-rs)
   fi
 
-  if [ -x "$ALPINEPROOT_PROOT_PATH" ]; then
+  if [ -n $ALPINEPROOT_PROOT_PATH ]; then
     unset PROOT && export PROOT=$ALPINEPROOT_PROOT_PATH
   fi
 
