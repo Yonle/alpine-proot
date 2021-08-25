@@ -117,17 +117,17 @@ EOM
   fi
 
   # Proceed make fake /proc/uptime
-  if [ ! -f /proc/uptime ] || [ ! -f $CONTAINER_PATH/proc/.uptime ]; then
+  if [ ! -r /proc/uptime ] || [ ! -f $CONTAINER_PATH/proc/.uptime ]; then
     echo "1302.49 5018.43" > $CONTAINER_PATH/proc/.uptime
   fi
 
   # Proceed make fake /proc/loadavg
-  if [ ! -f /proc/loadavg ] || [ ! -f $CONTAINER_PATH/proc/.loadavg ]; then
+  if [ ! -r /proc/loadavg ] || [ ! -f $CONTAINER_PATH/proc/.loadavg ]; then
     echo "0.54 0.22 0.13 1/461 650" > $CONTAINER_PATH/proc/.loadavg
   fi
 
   # Proceed make fake /proc/vmstat
-  if [ ! -f /proc/vmstat ] || [ ! -f $CONTAINER_PATH/proc/.vmstat ]; then
+  if [ ! -r /proc/vmstat ] || [ ! -f $CONTAINER_PATH/proc/.vmstat ]; then
     cat <<- EOM > $CONTAINER_PATH/proc/.vmstat
 nr_free_pages 3621122
 nr_zone_inactive_anon 13457
