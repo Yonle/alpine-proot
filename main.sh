@@ -94,12 +94,12 @@ alpineproot() {
   fi
 
   # Proceed make fake /proc/version
-  if [ ! -f /proc/version ] || [ ! -f $CONTAINER_PATH/proc/.version ]; then
+  if [ ! -f $CONTAINER_PATH/proc/.version ]; then
     echo "Linux version 5.4.120+ (root@localhost) #1 SMP Fri Jul 23 12:00:00 PDT 2021" > $CONTAINER_PATH/proc/.version
   fi
 
   # Proceed make fake /proc/stat
-  if [ ! -f /proc/stat ] || [ ! -f $CONTAINER_PATH/proc/.stat ]; then
+  if [ ! -r /proc/stat ] || [ ! -f $CONTAINER_PATH/proc/.stat ]; then
     cat <<- EOM > $CONTAINER_PATH/proc/.stat
 cpu  5742 0 3915 205916 1204 0 339 82 0 0
 cpu0 1428 0 904 51706 126 0 108 21 0 0
