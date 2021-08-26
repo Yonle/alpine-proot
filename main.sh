@@ -32,7 +32,7 @@ if [ ! $CONTAINER_PATH ]; then
 fi
 
 if [ ! $CONTAINER_DOWNLOAD_URL ]; then
-  export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/$(uname -m)/alpine-minirootfs-3.14.1-$(uname -m).tar.gz"
+  export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/arm/alpine-minirootfs-3.14.1-arm.tar.gz"
 fi
 
 alpineproot() {
@@ -54,6 +54,12 @@ alpineproot() {
     fi
     echo "PRoot / PRoot-rs is required in order to execute this script."
     echo "More information can go to https://proot-me.github.io"
+    exit 6
+  fi
+
+  if [ -z $(command -v gzip) ] || [ ! -x $(command -v gzip) ]; then
+    echo "gzip is required in order to extract Alpine rootfs."
+    echo "More information can go to https://www.gnu.org/software/gzip/"
     exit 6
   fi
 
