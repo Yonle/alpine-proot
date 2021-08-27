@@ -105,7 +105,7 @@ alpineproot() {
   fi
 
   # Proceed make fake /proc/stat
-  if [ ! -r /proc/stat ] || [ ! -f $CONTAINER_PATH/proc/.stat ]; then
+  if [ ! -r /proc/stat ] && [ ! -f $CONTAINER_PATH/proc/.stat ]; then
     cat <<- EOM > $CONTAINER_PATH/proc/.stat
 cpu  5742 0 3915 205916 1204 0 339 82 0 0
 cpu0 1428 0 904 51706 126 0 108 21 0 0
@@ -123,17 +123,17 @@ EOM
   fi
 
   # Proceed make fake /proc/uptime
-  if [ ! -r /proc/uptime ] || [ ! -f $CONTAINER_PATH/proc/.uptime ]; then
+  if [ ! -r /proc/uptime ] && [ ! -f $CONTAINER_PATH/proc/.uptime ]; then
     echo "1302.49 5018.43" > $CONTAINER_PATH/proc/.uptime
   fi
 
   # Proceed make fake /proc/loadavg
-  if [ ! -r /proc/loadavg ] || [ ! -f $CONTAINER_PATH/proc/.loadavg ]; then
+  if [ ! -r /proc/loadavg ] && [ ! -f $CONTAINER_PATH/proc/.loadavg ]; then
     echo "0.54 0.22 0.13 1/461 650" > $CONTAINER_PATH/proc/.loadavg
   fi
 
   # Proceed make fake /proc/vmstat
-  if [ ! -r /proc/vmstat ] || [ ! -f $CONTAINER_PATH/proc/.vmstat ]; then
+  if [ ! -r /proc/vmstat ] && [ ! -f $CONTAINER_PATH/proc/.vmstat ]; then
     cat <<- EOM > $CONTAINER_PATH/proc/.vmstat
 nr_free_pages 3621122
 nr_zone_inactive_anon 13457
