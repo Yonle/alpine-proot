@@ -96,8 +96,8 @@ alpineproot() {
     echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" > $CONTAINER_PATH/etc/resolv.conf
   fi
 
-  rm -rf $CONTAINER_PATH/proc
-  mkdir $CONTAINER_PATH/proc
+  proot -0 rm -rf $CONTAINER_PATH/proc
+  proot -0 mkdir $CONTAINER_PATH/proc
 
   # Proceed make fake /proc/version
   echo "Linux version 5.4.120+ (root@localhost) #1 SMP Fri Jul 23 12:00:00 PDT 2021" > $CONTAINER_PATH/proc/.version
