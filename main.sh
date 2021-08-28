@@ -32,7 +32,7 @@ if [ ! $CONTAINER_PATH ]; then
 fi
 
 if [ ! $CONTAINER_DOWNLOAD_URL ]; then
-  export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/arm/alpine-minirootfs-3.14.1-arm.tar.gz"
+  export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/$(uname -m)/alpine-minirootfs-3.14.2-$(uname -m).tar.gz"
 fi
 
 alpineproot() {
