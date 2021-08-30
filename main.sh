@@ -100,7 +100,7 @@ alpineproot() {
   mkdir $CONTAINER_PATH/proc
 
   # Proceed make fake /proc/version
-  echo "Linux version 5.11.0+ (root@localhost) #1 SMP Fri Jul 23 12:00:00 PDT 2021" > $CONTAINER_PATH/proc/.version
+  echo "Linux version 6.0.0+ (root@localhost) #1 SMP Fri Jul 23 12:00:00 PDT 2021" > $CONTAINER_PATH/proc/.version
 
   # Proceed make fake /proc/stat
   if [ ! -r /proc/stat ]; then
@@ -274,7 +274,7 @@ EOM
   COMMANDS=$PROOT
   COMMANDS="$COMMANDS --link2symlink"
   COMMANDS="$COMMANDS --kill-on-exit"
-  COMMANDS="$COMMANDS --kernel-release=5.11.0+"
+  COMMANDS="$COMMANDS --kernel-release=6.0.0+"
   COMMANDS="$COMMANDS -b /dev -b /proc -b /sys"
   COMMANDS="$COMMANDS -b /proc/self/fd:/dev/fd"
   COMMANDS="$COMMANDS -b /proc/self/fd/0:/dev/stdin"
