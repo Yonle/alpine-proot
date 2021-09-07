@@ -316,15 +316,6 @@ EOM
     COMMANDS="$COMMANDS -b $TMPDIR:/tmp"
   fi
 
-  if [ -z "$2" ]; then
-    if [ -f $CONTAINER_PATH/etc/motd ] && [ ! -f $CONTAINER_PATH/root/.hushlogin ]; then
-      cat $CONTAINER_PATH/etc/motd
-    else
-      if [ -f $CONTAINER_PATH/root/.hushlogin ]; then
-        cat $CONTAINER_PATH/root/.hushlogin;
-      fi
-    fi
-  fi
   $COMMANDS /bin/su -l $@
 }
 
