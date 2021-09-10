@@ -316,7 +316,7 @@ EOM
     COMMANDS="$COMMANDS -b $TMPDIR:/tmp"
   fi
 
-  if [ -z "$@" ]; then
+  if [ "$#" = 0 ]; then
     eval "exec $COMMANDS /bin/su -l"
   else
     eval "exec $COMMANDS /bin/su -l \"$@\""
