@@ -316,7 +316,11 @@ EOM
     COMMANDS="$COMMANDS -b $TMPDIR:/tmp"
   fi
 
-  eval "exec $COMMANDS /bin/su -l \"$@\""
+  if [ -z "$@" ]; then
+    eval "exec $COMMANDS /bin/su -l"
+  else
+    eval "exec $COMMANDS /bin/su -l \"$@\""
+  fi
 }
 
 alpineproot "$@"
