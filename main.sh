@@ -323,4 +323,4 @@ EOM
   fi
 }
 
-alpineproot "$@"
+alpineproot $@
