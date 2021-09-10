@@ -316,7 +316,7 @@ EOM
     COMMANDS="$COMMANDS -b $TMPDIR:/tmp"
   fi
 
-  $COMMANDS /bin/su -l $@
+  eval "exec $COMMANDS /bin/su -l \"$@\""
 }
 
-alpineproot $@
+alpineproot "$@"
