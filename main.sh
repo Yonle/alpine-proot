@@ -3,55 +3,28 @@
 # alpine-proot - A well quick standalone Alpine PRoot installer & launcher
 # https://github.com/Yonle/alpine-proot
 
-if [ "$ALPINEPROOT_FORCE" ]; then
-  echo "Warning: I'm sure you know what are you doing."
-fi
+[ -f ${ALPINEPROOT_RC_PATH:-~/.alpineprootrc} ] && ${ALPINEPROOT_RC_PATH:-~/.alpineprootrc}
+
+[ "$ALPINEPROOT_FORCE" ] && echo "Warning: I'm sure you know what are you doing."
 
 # Do not run if user run this script as root
-if [ $(id -u) = 0 ] && [ ! "$ALPINEPROOT_FORCE" ]; then
-  echo "Running alpine-proot as root is dangerous and can harm one of your system component. Because of that, I'm aborting now. You may set ALPINEPROOT_FORCE variable as 1 if you want to continue."
-  exit 6
-fi
+[ $(id -u) = 0 ] && [ ! "$ALPINEPROOT_FORCE" ] && echo "Running alpine-proot as root is dangerous and can harm one of your system component. Because of that, I'm aborting now. You may set ALPINEPROOT_FORCE variable as 1 if you want to continue." && exit 6
 
-if [ ! $HOME ]; then
-  export HOME=/home
-fi
-
-if [ ! $PREFIX ] && [ -x /usr ]; then
-  if [ -d /usr ]; then
-    export PREFIX=/usr
-  fi
-fi
-
-if [ ! $TMPDIR ]; then
-  export TMPDIR=/tmp
-fi
-
-if [ ! $CONTAINER_PATH ]; then
-  export CONTAINER_PATH="$HOME/.container"
-fi
-
-if [ ! $CONTAINER_DOWNLOAD_URL ]; then
-  export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/$(uname -m)/alpine-minirootfs-3.14.2-$(uname -m).tar.gz"
-fi
+[ ! $HOME ] && export HOME=/home
+[ ! $PREFIX ] && [ -x /usr ] && [ -d /usr ] && export PREFIX=/usr
+[ ! $TMPDIR ] && export TMPDIR=/tmp
+[ ! $CONTAINER_PATH ] && export CONTAINER_PATH="$HOME/.container"
+[ ! $CONTAINER_DOWNLOAD_URL ] && export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/$(uname -m)/alpine-minirootfs-3.14.2-$(uname -m).tar.gz"
 
 alpineproot() {
   export PROOT=$(command -v proot) || $(command -v proot-rs)
 
-  if [ -n "$ALPINEPROOT_USE_PROOT_RS" ] && [ -x $(command -v proot-rs) ]; then
-    unset PROOT && export PROOT=$(command -v proot-rs)
-  fi
-
-  if [ -n "$ALPINEPROOT_PROOT_PATH" ]; then
-    unset PROOT && export PROOT=$ALPINEPROOT_PROOT_PATH
-  fi
+  [ -n "$ALPINEPROOT_USE_PROOT_RS" ] && [ -x $(command -v proot-rs) ] && unset PROOT && export PROOT=$(command -v proot-rs)
+  [ -n "$ALPINEPROOT_PROOT_PATH" ] && unset PROOT && export PROOT=$ALPINEPROOT_PROOT_PATH
 
   # Check whenever proot is installed or no
   if [ -z "$PROOT" ] || [ ! -x $PROOT ]; then
-    if [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg); then
-      pkg install proot -y && alpineproot $@
-      exit 0
-    fi
+    [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg) && pkg install proot -y && alpineproot $@ && exit 0
     echo "PRoot / PRoot-rs is required in order to execute this script."
     echo "More information can go to https://proot-me.github.io"
     exit 6
@@ -68,10 +41,7 @@ alpineproot() {
     # Download rootfs if there's no rootfs download cache.
     if [ ! -f $HOME/.cached_rootfs.tar.gz ]; then
       if [ ! -x $(command -v curl) ]; then
-        if [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg); then
-          pkg install curl -y && alpineproot $@
-          exit 0
-        fi
+        [ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg) && pkg install curl -y && alpineproot $@ && exit 0
         echo "libcurl is required in order to download rootfs manually"
         echo "More information can go to https://curl.se/libcurl"
         exit 6
@@ -80,18 +50,13 @@ alpineproot() {
       if [ $? != 0 ]; then exit 1; fi
     fi
 
-    if [ ! -d $CONTAINER_PATH ]; then
-      mkdir -p $CONTAINER_PATH
-    fi
+    [ ! -d $CONTAINER_PATH ] && mkdir -p $CONTAINER_PATH
 
     # Use proot to prevent hard link extraction error
     $PROOT --link2symlink tar -xzf $HOME/.cached_rootfs.tar.gz -C $CONTAINER_PATH
 
     # If extraction fail, Delete cached rootfs and try again
-    if [ $? != 0 ]; then
-      rm -f $HOME/.cached_rootfs.tar.gz && alpineproot $@
-      exit 0
-    fi
+    [ $? != 0 ] && rm -f $HOME/.cached_rootfs.tar.gz && alpineproot $@ && exit 0
 
     echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" > $CONTAINER_PATH/etc/resolv.conf
   fi
@@ -103,8 +68,7 @@ alpineproot() {
   echo "Linux version 6.0.0+ (root@localhost) #1 SMP Fri Jul 23 12:00:00 PDT 2021" > $CONTAINER_PATH/proc/.version
 
   # Proceed make fake /proc/stat
-  if [ ! -r /proc/stat ]; then
-    cat <<- EOM > $CONTAINER_PATH/proc/.stat
+  [ ! -r /proc/stat ] && cat <<- EOM > $CONTAINER_PATH/proc/.stat
 cpu  5742 0 3915 205916 1204 0 339 82 0 0
 cpu0 1428 0 904 51706 126 0 108 21 0 0
 cpu1 1455 0 846 51772 99 0 87 20 0 0
@@ -118,21 +82,15 @@ procs_running 1
 procs_blocked 0
 softirq 562902 0 237872 366 6862 26279 0 9 122617 0 168897
 EOM
-  fi
 
   # Proceed make fake /proc/uptime
-  if [ ! -r /proc/uptime ]; then
-    echo "1302.49 5018.43" > $CONTAINER_PATH/proc/.uptime
-  fi
+  [ ! -r /proc/uptime ] && echo "1302.49 5018.43" > $CONTAINER_PATH/proc/.uptime
 
   # Proceed make fake /proc/loadavg
-  if [ ! -r /proc/loadavg ]; then
-    echo "0.54 0.22 0.13 1/461 650" > $CONTAINER_PATH/proc/.loadavg
-  fi
+  [ ! -r /proc/loadavg ] && echo "0.54 0.22 0.13 1/461 650" > $CONTAINER_PATH/proc/.loadavg
 
   # Proceed make fake /proc/vmstat
-  if [ ! -r /proc/vmstat ]; then
-    cat <<- EOM > $CONTAINER_PATH/proc/.vmstat
+  [ ! -r /proc/vmstat ] && cat <<- EOM > $CONTAINER_PATH/proc/.vmstat
 nr_free_pages 3621122
 nr_zone_inactive_anon 13457
 nr_zone_active_anon 93331
@@ -267,7 +225,6 @@ balloon_migrate 0
 swap_ra 0
 swap_ra_hit 0
 EOM
-  fi
 
   if [ "$(uname -o)" = "Android" ]; then unset LD_PRELOAD; fi
 
@@ -281,9 +238,7 @@ EOM
   COMMANDS="$COMMANDS -b /proc/self/fd/1:/dev/stdout"
   COMMANDS="$COMMANDS -b /proc/self/fd/2:/dev/stderr"
   for f in stat version loadavg vmstat uptime; do
-    if [ -f "$CONTAINER_PATH/proc/.$f" ]; then
-      COMMANDS="$COMMANDS -b $CONTAINER_PATH/proc/.$f:/proc/$f"
-    fi
+    [ -f "$CONTAINER_PATH/proc/.$f" ] && COMMANDS="$COMMANDS -b $CONTAINER_PATH/proc/.$f:/proc/$f"
   done
   COMMANDS="$COMMANDS -r $CONTAINER_PATH -0 -w /root"
   COMMANDS="$COMMANDS -b $CONTAINER_PATH/root:/dev/shm"
@@ -291,30 +246,20 @@ EOM
   # Detect whenever Pulseaudio is installed with POSIX support
   if pulseaudio=$(command -v pulseaudio) && [ ! -S $PREFIX/var/run/pulse/native ]; then
     if [ -z "$ALPINEPROOT_NO_PULSE" ]; then
-      if ! $pulseaudio --check; then
-        $pulseaudio --start --exit-idle-time=-1
-      fi
+      ! $pulseaudio --check && $pulseaudio --start --exit-idle-time=-1
 
-      if [ $? = 0 ] && [ -S "$(echo $TMPDIR/pulse-*/native)" ]; then
-        COMMANDS="$COMMANDS -b $(echo $TMPDIR/pulse-*/native):/var/run/pulse/native"
-      fi
+      [ $? = 0 ] && [ -S "$(echo $TMPDIR/pulse-*/native)" ] && COMMANDS="$COMMANDS -b $(echo $TMPDIR/pulse-*/native):/var/run/pulse/native"
     fi
   else
     if [ -z "$ALPINEPROOT_NO_PULSE" ]; then
-      if [ -S $PREFIX/var/run/pulse/native ]; then
-        COMMANDS="$COMMANDS -b $PREFIX/var/run/pulse/native:/var/run/pulse/native"
-      fi
+      [ -S $PREFIX/var/run/pulse/native ] && COMMANDS="$COMMANDS -b $PREFIX/var/run/pulse/native:/var/run/pulse/native"
     fi
   fi
 
-  if [ -n "$ALPINEPROOT_PROOT_OPTIONS" ]; then
-    COMMANDS="$COMMANDS $ALPINEPROOT_PROOT_OPTIONS"
-  fi
+  [ -n "$ALPINEPROOT_PROOT_OPTIONS" ] && COMMANDS="$COMMANDS $ALPINEPROOT_PROOT_OPTIONS"
 
   # Detect whenever ALPINEPROOT_BIND_TMPDIR is available or no.
-  if [ -n "$ALPINEPROOT_BIND_TMPDIR" ]; then
-    COMMANDS="$COMMANDS -b $TMPDIR:/tmp"
-  fi
+  [ -n "$ALPINEPROOT_BIND_TMPDIR" ] && COMMANDS="$COMMANDS -b $TMPDIR:/tmp"
 
   if [ "$#" = 0 ]; then
     eval "exec $COMMANDS /bin/su -l"
