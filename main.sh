@@ -231,7 +231,7 @@ alpineproot() {
 	COMMANDS=$PROOT
 	COMMANDS+=" --link2symlink"
 	COMMANDS+=" --kill-on-exit"
-	COMMANDS+=" --kernel-release=${ALPINEPROOT_KERNEL_RELEASE:-6.0.0+}"
+	COMMANDS+=" --kernel-release=\"${ALPINEPROOT_KERNEL_RELEASE:-6.0.0+}\""
 	COMMANDS+=" -b /dev -b /proc -b /sys"
 	COMMANDS+=" -b /proc/self/fd:/dev/fd"
 	COMMANDS+=" -b /proc/self/fd/0:/dev/stdin"
