@@ -16,7 +16,7 @@ It's very recommended to use [this](https://github.com/termux/proot) proot fork 
 
 For more information about alpine-proot, please check the alpine-proot [wiki](https://github.com/Yonle/alpine-proot/wiki).
 ## Sound support
-In order to make this works, **__PulseAudio__** should be installed at host system. At startup, the script automatically launch PulseAudio server in non-system mode if there is no pulse UNIX socket detected. However, in [alpine-proot](https://github.com/Yonle/alpine-proot), sound support is already ready-to-use at startup as long you have PulseAudio and `alsa-plugins-pulse` installed on the host system.
+In order to make this works, **__PulseAudio__** should be installed at host system. At startup, the script automatically launch PulseAudio server in non-system mode if there is no pulse UNIX socket detected. However, in [alpine-proot](https://github.com/Yonle/alpine-proot), sound support is already ready-to-use at startup as long you have PulseAudio(both host and guest) and `alsa-plugins-pulse`(guest) installed on both host and guest system.
 
 ## Online alpine-proot
 https://replit.com/@Yonle/PRoot (1 GB Storage per anonymous user)
