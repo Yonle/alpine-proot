@@ -1,9 +1,9 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # alpine-proot - A well quick standalone Alpine PRoot installer & launcher
 # https://github.com/Yonle/alpine-proot
 
-[ -f ${ALPINEPROOT_RC_PATH:-~/.alpineprootrc} ] && ${ALPINEPROOT_RC_PATH:-~/.alpineprootrc}
+[ -x ${ALPINEPROOT_RC_PATH:-~/.alpineprootrc} ] && source ${ALPINEPROOT_RC_PATH:-~/.alpineprootrc}
 
 [ "$ALPINEPROOT_FORCE" ] && echo "Warning: I'm sure you know what are you doing."
 
@@ -229,37 +229,37 @@ alpineproot() {
 	if [ "$(uname -o)" = "Android" ]; then unset LD_PRELOAD; fi
 
 	COMMANDS=$PROOT
-	COMMANDS="$COMMANDS --link2symlink"
-	COMMANDS="$COMMANDS --kill-on-exit"
-	COMMANDS="$COMMANDS --kernel-release=6.0.0+"
-	COMMANDS="$COMMANDS -b /dev -b /proc -b /sys"
-	COMMANDS="$COMMANDS -b /proc/self/fd:/dev/fd"
-	COMMANDS="$COMMANDS -b /proc/self/fd/0:/dev/stdin"
-	COMMANDS="$COMMANDS -b /proc/self/fd/1:/dev/stdout"
-	COMMANDS="$COMMANDS -b /proc/self/fd/2:/dev/stderr"
+	COMMANDS+=" --link2symlink"
+	COMMANDS+=" --kill-on-exit"
+	COMMANDS+=" --kernel-release=6.0.0+"
+	COMMANDS+=" -b /dev -b /proc -b /sys"
+	COMMANDS+=" -b /proc/self/fd:/dev/fd"
+	COMMANDS+=" -b /proc/self/fd/0:/dev/stdin"
+	COMMANDS+=" -b /proc/self/fd/1:/dev/stdout"
+	COMMANDS+=" -b /proc/self/fd/2:/dev/stderr"
 	for f in stat version loadavg vmstat uptime; do
-		[ -f "$CONTAINER_PATH/proc/.$f" ] && COMMANDS="$COMMANDS -b $CONTAINER_PATH/proc/.$f:/proc/$f"
+		[ -f "$CONTAINER_PATH/proc/.$f" ] && COMMANDS+=" -b $CONTAINER_PATH/proc/.$f:/proc/$f"
 	done
-	COMMANDS="$COMMANDS -r $CONTAINER_PATH -0 -w /root"
-	COMMANDS="$COMMANDS -b $CONTAINER_PATH/root:/dev/shm"
+	COMMANDS+=" -r $CONTAINER_PATH -0 -w /root"
+	COMMANDS+=" -b $CONTAINER_PATH/root:/dev/shm"
 
 	# Detect whenever Pulseaudio is installed with POSIX support
 	if pulseaudio=$(command -v pulseaudio) && [ ! -S $PREFIX/var/run/pulse/native ]; then
 		if [ -z "$ALPINEPROOT_NO_PULSE" ]; then
 			! $pulseaudio --check && $pulseaudio --start --exit-idle-time=-1
 
-			[ $? = 0 ] && [ -S "$(echo $TMPDIR/pulse-*/native)" ] && COMMANDS="$COMMANDS -b $(echo $TMPDIR/pulse-*/native):/var/run/pulse/native"
+			[ $? = 0 ] && [ -S "$(echo $TMPDIR/pulse-*/native)" ] && COMMANDS+=" -b $(echo $TMPDIR/pulse-*/native):/var/run/pulse/native"
 		fi
 	else
 		if [ -z "$ALPINEPROOT_NO_PULSE" ]; then
-			[ -S $PREFIX/var/run/pulse/native ] && COMMANDS="$COMMANDS -b $PREFIX/var/run/pulse/native:/var/run/pulse/native"
+			[ -S $PREFIX/var/run/pulse/native ] && COMMANDS+=" -b $PREFIX/var/run/pulse/native:/var/run/pulse/native"
 		fi
 	fi
 
-	[ -n "$ALPINEPROOT_PROOT_OPTIONS" ] && COMMANDS="$COMMANDS $ALPINEPROOT_PROOT_OPTIONS"
+	[ -n "$ALPINEPROOT_PROOT_OPTIONS" ] && COMMANDS+=" $ALPINEPROOT_PROOT_OPTIONS"
 
 	# Detect whenever ALPINEPROOT_BIND_TMPDIR is available or no.
-	[ -n "$ALPINEPROOT_BIND_TMPDIR" ] && COMMANDS="$COMMANDS -b $TMPDIR:/tmp"
+	[ -n "$ALPINEPROOT_BIND_TMPDIR" ] && COMMANDS+=" -b $TMPDIR:/tmp"
 
 	if [ "$#" = 0 ]; then
 		eval "exec $COMMANDS /bin/su -l"
