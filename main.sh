@@ -13,8 +13,13 @@
 [ ! $HOME ] && export HOME=/home
 [ ! $PREFIX ] && [ -x /usr ] && [ -d /usr ] && export PREFIX=/usr
 [ ! $TMPDIR ] && export TMPDIR=/tmp
-[ ! $CONTAINER_PATH ] && export CONTAINER_PATH="$HOME/.container"
+[ ! $CONTAINER_PATH ] && export CONTAINER_PATH="$HOME/.alpinelinux_container"
 [ ! $CONTAINER_DOWNLOAD_URL ] && export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/$(uname -m)/alpine-minirootfs-3.14.2-$(uname -m).tar.gz"
+
+# Detect old container directory, then we renane it.
+# Most old 3rd party alpine-proot script may still using .container path,
+# So we also create symlink on it
+[ -d $HOME/.container ] && ! [ -z "$(ls -A $HOME/.container)" ] && [ -x $HOME/bin/busybox ] && mv $HOME/.container $HOME/.alpinelinux_container && ln -s $HOME/.alpinelinux_container $HOME/.container
 
 alpineproot() {
 	export PROOT=$(command -v proot) || $(command -v proot-rs)
