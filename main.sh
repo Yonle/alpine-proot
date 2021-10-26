@@ -3,7 +3,7 @@
 # alpine-proot - A well quick standalone Alpine PRoot installer & launcher
 # https://github.com/Yonle/alpine-proot
 
-[ $(uname -s) != "Linux" ] && && [ ! "$ALPINEPROOT_FORCE" ] && exec echo "Expected Linux kernel, But got unsupported kernel ($(uname -s))."
+[ $(uname -s) != "Linux" ] && [ ! "$ALPINEPROOT_FORCE" ] && exec echo "Expected Linux kernel, But got unsupported kernel ($(uname -s))."
 
 [ -x ${ALPINEPROOT_RC_PATH:-~/.alpineprootrc} ] && source ${ALPINEPROOT_RC_PATH:-~/.alpineprootrc}
 
