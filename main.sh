@@ -16,7 +16,7 @@
 [ ! $PREFIX ] && [ -x /usr ] && [ -d /usr ] && export PREFIX=/usr
 [ ! $TMPDIR ] && export TMPDIR=/tmp
 [ ! $CONTAINER_PATH ] && export CONTAINER_PATH="$HOME/.alpinelinux_container"
-[ ! $CONTAINER_DOWNLOAD_URL ] && export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/$(uname -m)/alpine-minirootfs-3.14.3-$(uname -m).tar.gz"
+[ ! $CONTAINER_DOWNLOAD_URL ] && export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.16/releases/$(uname -m)/alpine-minirootfs-3.16.0-$(uname -m).tar.gz"
 
 alpineproot() {
 	export PROOT=$(command -v proot) || $(command -v proot-rs)
@@ -233,7 +233,7 @@ alpineproot() {
 	COMMANDS=$PROOT
 	COMMANDS+=" --link2symlink"
 	COMMANDS+=" --kill-on-exit"
-	COMMANDS+=" --kernel-release=\"${ALPINEPROOT_KERNEL_RELEASE:-6.0.0+}\""
+	COMMANDS+=" --kernel-release=\"${ALPINEPROOT_KERNEL_RELEASE:-5.18}\""
 	COMMANDS+=" -b /dev -b /proc -b /sys"
 	COMMANDS+=" -b /proc/self/fd:/dev/fd"
 	COMMANDS+=" -b /proc/self/fd/0:/dev/stdin"
