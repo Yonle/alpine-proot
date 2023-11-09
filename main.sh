@@ -21,6 +21,11 @@
 alpineproot() {
 	export PROOT=$(command -v proot) || $(command -v proot-rs)
 
+	if [ -x $CONTAINER_PATH/bin/busybox ]; then
+		__start $@
+		exit
+	fi
+
 	[ -n "$ALPINEPROOT_USE_PROOT_RS" ] && [ -x $(command -v proot-rs) ] && unset PROOT && export PROOT=$(command -v proot-rs)
 	[ -n "$ALPINEPROOT_PROOT_PATH" ] && unset PROOT && export PROOT=$ALPINEPROOT_PROOT_PATH
 
@@ -39,7 +44,7 @@ alpineproot() {
 	fi
 
 	# Install / Reinstall if container directory is unavailable or empty.
-	if [ ! -d $CONTAINER_PATH ] || [ -z "$(ls -A $CONTAINER_PATH)" ] || [ ! -x $CONTAINER_PATH/bin/busybox ]; then
+	if [ ! -x $CONTAINER_PATH/bin/busybox ]; then
 		# Download rootfs if there's no rootfs download cache.
 		if [ ! -f $HOME/.cached_rootfs.tar.gz ]; then
 			if [ ! -x $(command -v curl) ]; then
@@ -58,11 +63,15 @@ alpineproot() {
 		$PROOT --link2symlink tar -xzf $HOME/.cached_rootfs.tar.gz -C $CONTAINER_PATH
 
 		# If extraction fail, Delete cached rootfs and try again
-		[ $? != 0 ] && rm -f $HOME/.cached_rootfs.tar.gz && alpineproot $@ && exit 0
+		[ "$?" != "0" ] && rm -f $HOME/.cached_rootfs.tar.gz && alpineproot $@ && exit 0
 
 		echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" >$CONTAINER_PATH/etc/resolv.conf
 	fi
 
+	__start $@
+}
+
+__start() {
 	proot -0 rm -rf $CONTAINER_PATH/proc
 	mkdir $CONTAINER_PATH/proc
 
@@ -266,7 +275,7 @@ alpineproot() {
 	if [ "$#" = 0 ]; then
 		eval "exec $COMMANDS /bin/su -l"
 	else
-		eval "exec $COMMANDS /bin/su -l \"$@\""
+		eval "exec $COMMANDS /bin/su -l -c \"$@\""
 	fi
 }
 
