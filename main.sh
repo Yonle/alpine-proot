@@ -16,7 +16,7 @@
 [ ! $PREFIX ] && [ -x /usr ] && [ -d /usr ] && export PREFIX=/usr
 [ ! $TMPDIR ] && export TMPDIR=/tmp
 [ ! $CONTAINER_PATH ] && export CONTAINER_PATH="$HOME/.alpinelinux_container"
-[ ! $CONTAINER_DOWNLOAD_URL ] && export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.16/releases/$(uname -m)/alpine-minirootfs-3.16.0-$(uname -m).tar.gz"
+[ ! $CONTAINER_DOWNLOAD_URL ] && export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/$(uname -m)/alpine-minirootfs-3.18.4-$(uname -m).tar.gz"
 
 alpineproot() {
 	export PROOT=$(command -v proot) || $(command -v proot-rs)
