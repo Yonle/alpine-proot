@@ -65,7 +65,7 @@ alpineproot() {
 		# If extraction fail, Delete cached rootfs and try again
 		[ "$?" != "0" ] && rm -f $HOME/.cached_rootfs.tar.gz && alpineproot $@ && exit 0
 
-		echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" >$CONTAINER_PATH/etc/resolv.conf
+		echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" >$CONTAINER_PATH/etc/resolv.conf
 	fi
 
 	__start $@
