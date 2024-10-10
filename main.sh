@@ -16,7 +16,8 @@
 [ ! $PREFIX ] && [ -x /usr ] && [ -d /usr ] && export PREFIX=/usr
 [ ! $TMPDIR ] && export TMPDIR=/tmp
 [ ! $CONTAINER_PATH ] && export CONTAINER_PATH="$HOME/.alpinelinux_container"
-[ ! $CONTAINER_DOWNLOAD_URL ] && export CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/$(uname -m)/alpine-minirootfs-3.18.4-$(uname -m).tar.gz"
+
+export CONTAINER_DOWNLOAD_URL=""
 
 alpineproot() {
 	export PROOT=$(command -v proot) || $(command -v proot-rs)
@@ -53,8 +54,11 @@ alpineproot() {
 				echo "More information can go to https://curl.se/libcurl"
 				exit 6
 			fi
-			curl -L#o $HOME/.cached_rootfs.tar.gz $CONTAINER_DOWNLOAD_URL
-			if [ $? != 0 ]; then exit 1; fi
+
+			[ -z $CONTAINER_DOWNLOAD_URL ] && __get_container_url
+
+			curl -fSL#o $HOME/.cached_rootfs.tar.gz $CONTAINER_DOWNLOAD_URL
+			if [ $? != 0 ]; then exit $?; fi
 		fi
 
 		[ ! -d $CONTAINER_PATH ] && mkdir -p $CONTAINER_PATH
@@ -69,6 +73,21 @@ alpineproot() {
 	fi
 
 	__start $@
+}
+
+__get_container_url() {
+	CURRENT_VERSION=`curl -fsSL https://alpinelinux.org/downloads/ | grep -oP '(?<=<strong>)[^<]+(?=</strong>)'`
+	[ "$?" != "0" ] && exit $?
+
+	CURRENT_VERSION_ID=`echo $CURRENT_VERSION | grep -oE '^[0-9]+\.[0-9]+'`
+
+	echo "The following Alpine Linux version will be installed:"
+	echo ""
+	echo "Current Version: ${CURRENT_VERSION}"
+	echo "Version ID: ${CURRENT_VERSION_ID}"
+	echo ""
+
+	CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v${CURRENT_VERSION_ID}/releases/$(uname -m)/alpine-minirootfs-${CURRENT_VERSION}-$(uname -m).tar.gz"
 }
 
 __start() {
