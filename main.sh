@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# alpine-proot - A well quick standalone Alpine PRoot installer & launcher
+# alpine-proot - A quick standalone Alpine Linux proot installer & launcher
 # https://github.com/Yonle/alpine-proot
 
 [ $(uname -s) != "Linux" ] && [ ! "$ALPINEPROOT_FORCE" ] && exec echo "Expected Linux kernel, But got unsupported kernel ($(uname -s))."
@@ -16,63 +16,44 @@
 [ ! $PREFIX ] && [ -x /usr ] && [ -d /usr ] && export PREFIX=/usr
 [ ! $TMPDIR ] && export TMPDIR=/tmp
 [ ! $CONTAINER_PATH ] && export CONTAINER_PATH="$HOME/.alpinelinux_container"
+[ ! $ALPINEPROOT_LAUNCHPAD ] && export ALPINEPROOT_LAUNCHPAD="$HOME/.alpineproot_launchpad"
+
+__start() {
+	unset LD_PRELOAD
+
+	COMMANDS=`cat $ALPINEPROOT_LAUNCHPAD`
+
+	if [ "$#" = 0 ]; then
+		eval "exec $COMMANDS /bin/su -l"
+	else
+		eval "exec $COMMANDS /bin/su -l -c \"$@\""
+	fi
+}
+
+[ -f $ALPINEPROOT_LAUNCHPAD ] && __start $@
 
 export CONTAINER_DOWNLOAD_URL=""
 
-alpineproot() {
-	export PROOT=$(command -v proot) || $(command -v proot-rs)
+__install() {
+	# Download rootfs if there's no rootfs download cache.
+	if [ ! -f $HOME/.cached_rootfs.tar.gz ]; then
+		[ -z $CONTAINER_DOWNLOAD_URL ] && __get_container_url
 
-	if [ -x $CONTAINER_PATH/bin/busybox ]; then
-		__start $@
-		exit
+		curl -fSL#o $HOME/.cached_rootfs.tar.gz $CONTAINER_DOWNLOAD_URL
+
+		[ $? != 0 ] && exit $?
 	fi
 
-	[ -n "$ALPINEPROOT_USE_PROOT_RS" ] && [ -x $(command -v proot-rs) ] && unset PROOT && export PROOT=$(command -v proot-rs)
-	[ -n "$ALPINEPROOT_PROOT_PATH" ] && unset PROOT && export PROOT=$ALPINEPROOT_PROOT_PATH
+	[ ! -d $CONTAINER_PATH ] && mkdir -p $CONTAINER_PATH
 
-	# Check whenever proot is installed or no
-	if [ -z "$PROOT" ] || [ ! -x $PROOT ]; then
-		[ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg) && pkg install proot -y && alpineproot $@ && exit 0
-		echo "PRoot / PRoot-rs is required in order to execute this script."
-		echo "More information can go to https://proot-me.github.io"
-		exit 6
-	fi
+	# Use proot to prevent hard link extraction error
+	proot --link2symlink tar -xzf $HOME/.cached_rootfs.tar.gz -C $CONTAINER_PATH
 
-	if [ -z $(command -v gzip) ] || [ ! -x $(command -v gzip) ]; then
-		echo "gzip is required in order to extract Alpine rootfs."
-		echo "More information can go to https://www.gnu.org/software/gzip/"
-		exit 6
-	fi
+	rm -f $HOME/.cached_rootfs.tar.gz
 
-	# Install / Reinstall if container directory is unavailable or empty.
-	if [ ! -x $CONTAINER_PATH/bin/busybox ]; then
-		# Download rootfs if there's no rootfs download cache.
-		if [ ! -f $HOME/.cached_rootfs.tar.gz ]; then
-			if [ ! -x $(command -v curl) ]; then
-				[ "$(uname -o)" = "Android" ] && pkg=$(command -v pkg) && pkg install curl -y && alpineproot $@ && exit 0
-				echo "libcurl is required in order to download rootfs manually"
-				echo "More information can go to https://curl.se/libcurl"
-				exit 6
-			fi
+	[ "$?" != "0" ] && exit $?
 
-			[ -z $CONTAINER_DOWNLOAD_URL ] && __get_container_url
-
-			curl -fSL#o $HOME/.cached_rootfs.tar.gz $CONTAINER_DOWNLOAD_URL
-			if [ $? != 0 ]; then exit $?; fi
-		fi
-
-		[ ! -d $CONTAINER_PATH ] && mkdir -p $CONTAINER_PATH
-
-		# Use proot to prevent hard link extraction error
-		$PROOT --link2symlink tar -xzf $HOME/.cached_rootfs.tar.gz -C $CONTAINER_PATH
-
-		# If extraction fail, Delete cached rootfs and try again
-		[ "$?" != "0" ] && rm -f $HOME/.cached_rootfs.tar.gz && alpineproot $@ && exit 0
-
-		echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" >$CONTAINER_PATH/etc/resolv.conf
-	fi
-
-	__start $@
+	__prepare
 }
 
 __get_container_url() {
@@ -90,7 +71,9 @@ __get_container_url() {
 	CONTAINER_DOWNLOAD_URL="https://dl-cdn.alpinelinux.org/alpine/v${CURRENT_VERSION_ID}/releases/$(uname -m)/alpine-minirootfs-${CURRENT_VERSION}-$(uname -m).tar.gz"
 }
 
-__start() {
+__prepare() {
+	echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" >$CONTAINER_PATH/etc/resolv.conf
+
 	proot -0 rm -rf $CONTAINER_PATH/proc
 	mkdir $CONTAINER_PATH/proc
 
@@ -256,9 +239,7 @@ __start() {
 		swap_ra_hit 0
 	EOM
 
-	if [ "$(uname -o)" = "Android" ]; then unset LD_PRELOAD; fi
-
-	COMMANDS=$PROOT
+	COMMANDS=proot
 	COMMANDS+=" --link2symlink"
 	COMMANDS+=" --kill-on-exit"
 	COMMANDS+=" --kernel-release=\"${ALPINEPROOT_KERNEL_RELEASE:-5.18}\""
@@ -273,29 +254,14 @@ __start() {
 	COMMANDS+=" -r $CONTAINER_PATH -0 -w /root"
 	COMMANDS+=" -b $CONTAINER_PATH/root:/dev/shm"
 
-	# Detect whenever Pulseaudio is installed with POSIX support
-	if pulseaudio=$(command -v pulseaudio) && [ ! -S $PREFIX/var/run/pulse/native ]; then
-		if [ -z "$ALPINEPROOT_NO_PULSE" ]; then
-			! $pulseaudio --check && $pulseaudio --start --exit-idle-time=-1
-
-			[ $? = 0 ] && [ -S "$(echo $TMPDIR/pulse-*/native)" ] && COMMANDS+=" -b $(echo $TMPDIR/pulse-*/native):/var/run/pulse/native"
-		fi
-	else
-		if [ -z "$ALPINEPROOT_NO_PULSE" ]; then
-			[ -S $PREFIX/var/run/pulse/native ] && COMMANDS+=" -b $PREFIX/var/run/pulse/native:/var/run/pulse/native"
-		fi
-	fi
-
 	[ -n "$ALPINEPROOT_PROOT_OPTIONS" ] && COMMANDS+=" $ALPINEPROOT_PROOT_OPTIONS"
 
 	# Detect whenever ALPINEPROOT_BIND_TMPDIR is available or no.
 	[ -n "$ALPINEPROOT_BIND_TMPDIR" ] && COMMANDS+=" -b $TMPDIR:/tmp"
 
-	if [ "$#" = 0 ]; then
-		eval "exec $COMMANDS /bin/su -l"
-	else
-		eval "exec $COMMANDS /bin/su -l -c \"$@\""
-	fi
+	echo $COMMANDS > $ALPINEPROOT_LAUNCHPAD
 }
 
-alpineproot $@
+! [ -x $CONTAINER_PATH/bin/busybox ] && __install
+! [ -f $ALPINEPROOT_LAUNCHPAD ] && __prepare
+__start $@
