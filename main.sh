@@ -53,6 +53,8 @@ __install() {
 
 	[ "$?" != "0" ] && exit $?
 
+	echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" >$CONTAINER_PATH/etc/resolv.conf
+
 	__prepare
 }
 
@@ -72,8 +74,6 @@ __get_container_url() {
 }
 
 __prepare() {
-	echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" >$CONTAINER_PATH/etc/resolv.conf
-
 	proot -0 rm -rf $CONTAINER_PATH/proc
 	mkdir $CONTAINER_PATH/proc
 
