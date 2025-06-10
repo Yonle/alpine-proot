@@ -15,7 +15,7 @@ A quick standalone [Alpine Linux](https://alpinelinux.org) proot installer & lau
 **Running**:
 
 ```sh
-curl -Lo alpine-proot.sh git.io/alpine-proot.sh
+curl -fSLo alpine-proot.sh git.io/alpine-proot.sh
 chmod +x alpine-proot.sh 
 
 # To launch alpine-proot anytime, simply do:
