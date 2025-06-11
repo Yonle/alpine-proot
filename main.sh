@@ -5,13 +5,15 @@
 
 [ $(uname -s) != "Linux" ] && [ ! "$ALPINEPROOT_FORCE" ] && exec echo "Expected Linux kernel, But got unsupported kernel ($(uname -s))."
 
-[ -x "${ALPINEPROOT_RC_PATH:-~/.alpineprootrc}" ] && source "${ALPINEPROOT_RC_PATH:-~/.alpineprootrc}"
+[ -z "$HOME" ] && export HOME=/home
+
+[ -z "${ALPINEPROOT_RC_PATH}" ] && export ALPINEPROOT_RC_PATH="${HOME}/.alpineprootrc"
+[ -f "${ALPINEPROOT_RC_PATH}" ] && source "${ALPINEPROOT_RC_PATH}"
 
 # Do not let user to run this script under root, Unless forced.
 ! [ -z "$ALPINEPROOT_FORCE" ] && echo "Warning: I'm sure you know what are you doing."
 [ "$(id -u)" = "0" ] && [ -z "$ALPINEPROOT_FORCE" ] && echo "Running alpine-proot as root is dangerous and can harm one of your system component. Because of that, I'm aborting now. You may set ALPINEPROOT_FORCE variable as 1 if you want to continue." && exit 6
 
-[ -z "$HOME" ] && export HOME=/home
 [ -z "$ALPINEPROOT_LAUNCHPAD" ] && export ALPINEPROOT_LAUNCHPAD="$HOME/.alpineproot_launchpad"
 
 __start() {
