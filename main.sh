@@ -265,6 +265,8 @@ swap_ra 0
 swap_ra_hit 0
 EOM
 
+	[ ! -r /proc/filesystems ] && echo -n > "$CONTAINER_PATH/proc/.filesystems"
+
 	COMMANDS=proot
 	COMMANDS+=" --link2symlink"
 	COMMANDS+=" --sysvipc"
@@ -276,7 +278,7 @@ EOM
 	COMMANDS+=" -b /proc/self/fd/0:/dev/stdin"
 	COMMANDS+=" -b /proc/self/fd/1:/dev/stdout"
 	COMMANDS+=" -b /proc/self/fd/2:/dev/stderr"
-	for f in stat version loadavg vmstat uptime; do
+	for f in stat version loadavg vmstat uptime filesystems; do
 		[ -f "$CONTAINER_PATH/proc/.$f" ] && COMMANDS+=" -b \"$CONTAINER_PATH/proc/.$f:/proc/$f\""
 	done
 	COMMANDS+=" -r \"$CONTAINER_PATH\" -0 -w /root"
