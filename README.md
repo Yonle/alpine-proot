@@ -8,6 +8,7 @@ A quick standalone [Alpine Linux](https://alpinelinux.org) proot installer & lau
 
 **Required Dependencies**:
 
+- `bash`
 - `curl`
 - `gzip`
 - [Termux's `proot`](https://github.com/termux/proot)
