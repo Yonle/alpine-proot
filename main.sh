@@ -7,15 +7,11 @@
 
 [ -x "${ALPINEPROOT_RC_PATH:-~/.alpineprootrc}" ] && source "${ALPINEPROOT_RC_PATH:-~/.alpineprootrc}"
 
+# Do not let user to run this script under root, Unless forced.
 ! [ -z "$ALPINEPROOT_FORCE" ] && echo "Warning: I'm sure you know what are you doing."
-
-# Do not run if user run this script as root
 [ "$(id -u)" = "0" ] && [ -z "$ALPINEPROOT_FORCE" ] && echo "Running alpine-proot as root is dangerous and can harm one of your system component. Because of that, I'm aborting now. You may set ALPINEPROOT_FORCE variable as 1 if you want to continue." && exit 6
 
 [ -z "$HOME" ] && export HOME=/home
-[ -z "$PREFIX" ] && [ -x /usr ] && [ -d /usr ] && export PREFIX=/usr
-[ -z "$TMPDIR" ] && export TMPDIR=/tmp
-[ -z "$CONTAINER_PATH" ] && export CONTAINER_PATH="$HOME/.alpinelinux_container"
 [ -z "$ALPINEPROOT_LAUNCHPAD" ] && export ALPINEPROOT_LAUNCHPAD="$HOME/.alpineproot_launchpad"
 
 __start() {
@@ -31,6 +27,11 @@ __start() {
 }
 
 [ -f "$ALPINEPROOT_LAUNCHPAD" ] && __start $@
+
+[ -z "$PREFIX" ] && [ -x /usr ] && [ -d /usr ] && export PREFIX=/usr
+[ -z "$TMPDIR" ] && export TMPDIR=/tmp
+[ -z "$CONTAINER_PATH" ] && export CONTAINER_PATH="$HOME/.alpinelinux_container"
+[ -z "$ALPINEPROOT_KERNEL_RELEASE" ] && export ALPINEPROOT_KERNEL_RELEASE="6.14.0-ap"
 
 export CONTAINER_DOWNLOAD_URL=""
 
@@ -103,7 +104,7 @@ __prepare() {
 	done
 
 	# Proceed make fake /proc/version
-	echo -n "Linux version ${ALPINEPROOT_KERNEL_RELEASE:-6.0.0+} (root@localhost) #1 SMP Fri Jul 23 12:00:00 PDT 2021" > "$CONTAINER_PATH/proc/.version"
+	echo -n "Linux version ${ALPINEPROOT_KERNEL_RELEASE} (root@localhost) #1 SMP Fri Jul 23 12:00:00 PDT 2021" > "$CONTAINER_PATH/proc/.version"
 
 	# Proceed make fake /proc/stat
 	[ ! -r /proc/stat ] && cat <<-EOM > "$CONTAINER_PATH/proc/.stat"
@@ -266,9 +267,11 @@ EOM
 
 	COMMANDS=proot
 	COMMANDS+=" --link2symlink"
+	COMMANDS+=" --sysvipc"
 	COMMANDS+=" --kill-on-exit"
-	COMMANDS+=" --kernel-release=\"${ALPINEPROOT_KERNEL_RELEASE:-5.18}\""
-	COMMANDS+=" -b /dev -b /proc -b /sys"
+	COMMANDS+=" --ashmem-memfd"
+	COMMANDS+=" --kernel-release=\"${ALPINEPROOT_KERNEL_RELEASE}\""
+	COMMANDS+=" -L -b /dev -b /proc -b /sys"
 	COMMANDS+=" -b /proc/self/fd:/dev/fd"
 	COMMANDS+=" -b /proc/self/fd/0:/dev/stdin"
 	COMMANDS+=" -b /proc/self/fd/1:/dev/stdout"
