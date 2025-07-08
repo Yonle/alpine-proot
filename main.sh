@@ -271,9 +271,7 @@ EOM
 
 	COMMANDS=proot
 	COMMANDS+=" --link2symlink"
-	COMMANDS+=" --sysvipc"
 	COMMANDS+=" --kill-on-exit"
-	COMMANDS+=" --ashmem-memfd"
 	COMMANDS+=" --kernel-release=\"${ALPINEPROOT_KERNEL_RELEASE}\""
 	COMMANDS+=" -L -b /dev -b /proc -b /sys"
 	COMMANDS+=" -b /proc/self/fd:/dev/fd"
